@@ -24,9 +24,10 @@ const userSchema = new mongoose.Schema({
         minlength: [6, "Password must be at least 6 characters long"],
         select: false  // Don't include password in queries by default
     },
-    isAdmin: {
-        type: Boolean,
-        default: false
+    role: {
+        type: String,
+        enum: ['tenant', 'landlord', 'admin'],
+        default: 'tenant'
     }
 }, { 
     timestamps: true  // This adds createdAt and updatedAt automatically

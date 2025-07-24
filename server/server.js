@@ -16,10 +16,13 @@ app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
 
 // Connect to MongoDB
-connectDB();
+//connectDB();
 
 //Import Routes
 const authRoutes = require('./routes/authRoutes');
+//app.use('/api/auth', authRoutes); // ⬅️ VERY IMPORTANT
+
+
 const listingRoutes = require('./routes/listingRoutes');
 const forumRoutes = require('./routes/forumRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
