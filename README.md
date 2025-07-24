@@ -1,52 +1,62 @@
-# MERN Stack Capstone Project
+# Boma Rental Platform
 
-This assignment focuses on designing, developing, and deploying a comprehensive full-stack MERN application that showcases all the skills you've learned throughout the course.
+Boma is a MERN stack web application that connects tenants and landlords, providing local insights, community communication tools, and verified rental listings. The platform features anonymous reviews, per-building forums, and role-based dashboards for tenants, landlords, and admins.
 
-## Assignment Overview
+## Features
+- **Authentication:** Register/login as tenant, landlord, or admin
+- **Role-based Dashboards:** Different dashboards for tenants, landlords, and admins
+- **Listings:** Browse, add, and manage rental listings (with verification)
+- **Silent Reviews:** Anonymous ratings for safety, water, and landlord reliability
+- **Community Forums:** Per-building complaint/discussion boards
+- **Responsive UI:** Modern, mobile-friendly design with Tailwind CSS and dark mode toggle
 
-You will:
-1. Plan and design a full-stack MERN application
-2. Develop a robust backend with MongoDB, Express.js, and Node.js
-3. Create an interactive frontend with React.js
-4. Implement testing across the entire application
-5. Deploy the application to production
+## Tech Stack
+- **Frontend:** React, Tailwind CSS, shadcn/ui, Heroicons, Axios, React Router
+- **Backend:** Node.js, Express, MongoDB, Mongoose, JWT, bcryptjs, CORS, dotenv
 
-## Getting Started
+## Setup Instructions
 
-1. Accept the GitHub Classroom assignment
-2. Clone the repository to your local machine
-3. Follow the instructions in the `Week8-Assignment.md` file
-4. Plan, develop, and deploy your capstone project
+### 1. Clone the Repository
+```sh
+git clone https://github.com/PLP-MERN-Stack-Development/week-8-capstone_-Ronald-Wesh.git
+cd week-8-capstone_-Ronald-Wesh
+```
 
-## Files Included
+### 2. Backend Setup
+```sh
+cd server
+pnpm install # or npm install
+```
+- Create a `.env` file in `/server` with:
+  ```env
+  MONGO_URI=your_mongodb_connection_string
+  JWT_SECRET=your_jwt_secret
+  PORT=5000
+  ```
+- Start the backend:
+  ```sh
+  pnpm dev # or npm run dev or node server.js
+  ```
 
-- `Week8-Assignment.md`: Detailed assignment instructions
+### 3. Frontend Setup
+```sh
+cd ../client
+pnpm install # or npm install
+```
+- Start the frontend:
+  ```sh
+  pnpm dev # or npm run dev
+  ```
 
-## Requirements
+### 4. Access the App
+- Open [http://localhost:5173](http://localhost:5173) in your browser (or the port shown in your terminal).
+- The backend runs on [http://localhost:5000](http://localhost:5000).
 
-- Node.js (v18 or higher)
-- MongoDB (local installation or Atlas account)
-- npm or yarn
-- Git and GitHub account
-- Accounts on deployment platforms (Render/Vercel/Netlify/etc.)
+## Usage Notes
+- Register as a tenant, landlord, or admin to access the app.
+- Dashboards and features are role-based.
+- Use the theme toggle in the navbar to switch between light and dark mode.
+- Listings, reviews, and forums are only accessible after login.
 
-## Project Ideas
-
-The `Week8-Assignment.md` file includes several project ideas, but you're encouraged to develop your own idea that demonstrates your skills and interests.
-
-## Submission
-
-Your project will be automatically submitted when you push to your GitHub Classroom repository. Make sure to:
-
-1. Commit and push your code regularly
-2. Include comprehensive documentation
-3. Deploy your application and add the live URL to your README.md
-4. Create a video demonstration and include the link in your README.md
-
-## Resources
-
-- [MongoDB Documentation](https://docs.mongodb.com/)
-- [Express.js Documentation](https://expressjs.com/)
-- [React Documentation](https://react.dev/)
-- [Node.js Documentation](https://nodejs.org/en/docs/)
-- [GitHub Classroom Guide](https://docs.github.com/en/education/manage-coursework-with-github-classroom) 
+## License
+MIT 
