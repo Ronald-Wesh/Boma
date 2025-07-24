@@ -1,5 +1,6 @@
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext.jsx';
 import { Button } from '../components/ui/button';
+
 const Dashboard = () => {
   const { user, logout, isAdmin } = useAuth();
 
