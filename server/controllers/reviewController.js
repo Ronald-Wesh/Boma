@@ -1,6 +1,23 @@
 const Review = require('../models/Review');
 
-// Get all reviews for a listing
+exports.getAllReviews = async (req, res) => {
+  try {
+    const reviews = await Review.find().populate('listing', 'title').populate('user', 'username');
+    res.json(reviews);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.getUserReviews = async (req, res) => {
+  try {
+    const reviews = await Review.find({ user: req.params.userId }).populate('listing', 'title');
+    res.json(reviews);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 exports.getReviews = async (req, res) => {
   try {
     const reviews = await Review.find({ listing: req.params.listingId }).sort({ createdAt: -1 });
@@ -10,7 +27,6 @@ exports.getReviews = async (req, res) => {
   }
 };
 
-// Create a new review for a listing (one per user per listing)
 exports.createReview = async (req, res) => {
   try {
     const existing = await Review.findOne({ listing: req.params.listingId, user: req.user._id });
@@ -19,10 +35,10 @@ exports.createReview = async (req, res) => {
     }
     const review = new Review({
       listing: req.params.listingId,
+      user: req.user._id,
       safety: req.body.safety,
       water: req.body.water,
-      landlordReliability: req.body.landlordReliability,
-      user: req.user._id
+      landlordReliability: req.body.landlordReliability
     });
     const saved = await review.save();
     res.status(201).json(saved);
@@ -31,12 +47,11 @@ exports.createReview = async (req, res) => {
   }
 };
 
-// Delete a review (by owner or admin)
 exports.deleteReview = async (req, res) => {
   try {
     const review = await Review.findById(req.params.reviewId);
     if (!review) return res.status(404).json({ message: 'Review not found' });
-    if (review.user && review.user.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+    if (review.user.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
       return res.status(403).json({ message: 'Not authorized' });
     }
     await review.deleteOne();

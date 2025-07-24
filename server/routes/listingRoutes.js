@@ -1,21 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const listingController = require('../controllers/listingController');
-const { protect,admin } = require('../middleware/authMiddleware');
+const { protect } = require('../middleware/authMiddleware');
 
-// Get all listings
+// GET /listings?search=...&filter=...&landlord=...
 router.get('/', listingController.getAllListings);
-
-// Get single listing by ID
+router.post('/', protect, listingController.createListing);
 router.get('/:id', listingController.getListingById);
-
-// Create new listing (protected)
-router.post('/', protect,admin,listingController.createListing);
-
-// Update listing (protected)
-router.put('/:id', protect,admin, listingController.updateListing);
-
-// Delete listing (protected)
-router.delete('/:id', protect,admin, listingController.deleteListing);
+router.put('/:id', protect, listingController.updateListing);
+router.delete('/:id', protect, listingController.deleteListing);
 
 module.exports = router;

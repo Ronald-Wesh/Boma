@@ -1,6 +1,14 @@
 const ForumPost = require('../models/ForumPost');
 
-// Get all forum posts for a listing
+exports.getAllForums = async (req, res) => {
+  try {
+    const posts = await ForumPost.find().populate('user', 'username').populate('listing', 'title');
+    res.json(posts);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 exports.getPosts = async (req, res) => {
   try {
     const posts = await ForumPost.find({ listing: req.params.listingId })
@@ -12,7 +20,6 @@ exports.getPosts = async (req, res) => {
   }
 };
 
-// Create a new forum post for a listing
 exports.createPost = async (req, res) => {
   try {
     const post = new ForumPost({
@@ -27,7 +34,6 @@ exports.createPost = async (req, res) => {
   }
 };
 
-// Delete a forum post (by owner or admin)
 exports.deletePost = async (req, res) => {
   try {
     const post = await ForumPost.findById(req.params.postId);
