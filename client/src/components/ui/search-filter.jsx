@@ -84,42 +84,58 @@ const SearchFilter = ({
     </div>
   );
 
-  const PropertyTypeFilter = () => (
+  const VerificationFilter = () => (
     <div className="space-y-2">
-      <label className="text-sm font-medium">Property Type</label>
+      <label className="text-sm font-medium">Verification Status</label>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" className="w-full justify-between">
-            {tempFilters.propertyType || 'Select type'}
+            {tempFilters.verified === true ? 'Verified Only' : 
+             tempFilters.verified === false ? 'Unverified Only' : 'All Properties'}
             <FunnelIcon className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuItem onClick={() => handleFilterChange('propertyType', null)}>
-            All Types
+          <DropdownMenuItem onClick={() => handleFilterChange('verified', null)}>
+            All Properties
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          {filters.propertyTypes?.map((type) => (
-            <DropdownMenuItem
-              key={type}
-              onClick={() => handleFilterChange('propertyType', type)}
-            >
-              {type}
-            </DropdownMenuItem>
-          ))}
+          <DropdownMenuItem onClick={() => handleFilterChange('verified', true)}>
+            Verified Only
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleFilterChange('verified', false)}>
+            Unverified Only
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
   );
 
-  const LocationFilter = () => (
+  const RoleFilter = () => (
     <div className="space-y-2">
-      <label className="text-sm font-medium">Location</label>
-      <Input
-        placeholder="Enter location"
-        value={tempFilters.location || ''}
-        onChange={(e) => handleFilterChange('location', e.target.value)}
-      />
+      <label className="text-sm font-medium">User Role</label>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" className="w-full justify-between">
+            {tempFilters.userRole || 'All Roles'}
+            <FunnelIcon className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem onClick={() => handleFilterChange('userRole', null)}>
+            All Roles
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          {filters.userRoles?.map((role) => (
+            <DropdownMenuItem
+              key={role}
+              onClick={() => handleFilterChange('userRole', role)}
+            >
+              {role.charAt(0).toUpperCase() + role.slice(1)}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 
@@ -157,7 +173,7 @@ const SearchFilter = ({
           placeholder={placeholder}
           value={searchTerm}
           onChange={(e) => handleSearch(e.target.value)}
-          className="pl-10 pr-4"
+          className="pl-10 pr-4 h-11"
         />
       </div>
 
@@ -192,7 +208,8 @@ const SearchFilter = ({
               onFilter?.(newFilters);
             }}
           >
-            {key}: {Array.isArray(value) ? value.join(', ') : value}
+            {key}: {Array.isArray(value) ? value.join(', ') : 
+             typeof value === 'boolean' ? (value ? 'Yes' : 'No') : value}
             <XMarkIcon className="h-3 w-3" />
           </Badge>
         ))}
@@ -211,15 +228,15 @@ const SearchFilter = ({
 
       {/* Advanced Filters Panel */}
       {showAdvancedFilters && (
-        <Card className="animate-slide-in">
+        <Card className="animate-slide-in glass">
           <CardHeader>
             <CardTitle className="text-lg">Advanced Filters</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <PriceRangeFilter />
-              <PropertyTypeFilter />
-              <LocationFilter />
+              <VerificationFilter />
+              <RoleFilter />
               <AmenitiesFilter />
             </div>
             
