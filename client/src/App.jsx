@@ -1,18 +1,22 @@
 import { Routes, Route, Navigate, BrowserRouter } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
+import { useEffect } from 'react';
+
+// Authentication Pages
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
-import {useEffect} from 'react';
-//import Listings from './pages/Listings.jsx';
+
+// Dashboard Pages
 import AdminDashboard from './pages/AdminDashboard.jsx';
-import LandlordDashboard from './pages/LandlordDashboard.jsx';
 import TenantDashboard from './pages/TenantDashboard.jsx';
+import Dashboard from './pages/Dashboard.jsx';
+
 import Navbar from './components/NavBar.jsx';
 import useAuth from './hooks/useAuth';
 
-import { Toaster } from 'react-hot-toast';
-
 function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
+  
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
@@ -27,90 +31,131 @@ function ProtectedRoute({ children }) {
   return isAuthenticated ? children : <Navigate to="/login" replace />;
 }
 
-// export default function DashboardRouter() {
-//   const { user,isAuthenticated,loading } = useAuth();
-//   if (!user) return <Navigate to="/login" />;
-//   if (user.role === 'admin') return <AdminDashboard />;
-//   if (user.role === 'landlord') return <LandlordDashboard />;
-//   return <TenantDashboard />;
-// }
-function DashboardRouter() {
+function RoleProtectedRoute({ children, allowedRoles = [] }) {
   const { user, isAuthenticated, loading } = useAuth();
-
-  // Show loading screen if auth state is still loading
-  if (loading) return <div>Loading...</div>;
-
-  // Not authenticated? Redirect to login
-  if (!isAuthenticated || !user) return <Navigate to="/login" />;
-
-  // Authenticated: route to dashboard by role
-  if (user.role === "admin") return <AdminDashboard />;
-  if (user.role === "landlord") return <LandlordDashboard />;
-  return <TenantDashboard />;
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-400"></div>
+      </div>
+    );
+  }
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  if (allowedRoles.length > 0 && !allowedRoles.includes(user?.role)) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  
+  return children;
 }
 
-
 export default function App() {
-  const { isAuthenticated } = useAuth();
-   // Initialize theme on app load
-   useEffect(() => {
+  const { isAuthenticated, loading } = useAuth();
+  
+  // Initialize theme on app load
+  useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme === "dark" || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       document.documentElement.classList.add("dark");
     }
   }, []);
 
-
-return (
-  <BrowserRouter>
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900 transition-all duration-500">
-      <Toaster 
-        position="top-right" 
-        toastOptions={{
-          duration: 4000,
-          style: {
-            background: 'var(--color-card)',
-            color: 'var(--color-foreground)',
-            border: '1px solid var(--color-border)',
-          },
-        }}
-      />
-      
-      {isAuthenticated && <Navbar />}
-      
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-
-        {/* <Route
-        path="/"
-        element={<Navigate to="/dashboard" replace />}
-      /> */}
-<Route
-  path="/"
-  element={
-    isAuthenticated 
-      ? <Navigate to="/dashboard" replace /> 
-      : <Navigate to="/login" replace />
+  // Show loading screen while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-400"></div>
+          <p className="text-purple-300 font-medium">Loading...</p>
+        </div>
+      </div>
+    );
   }
-/>
 
-
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <DashboardRouter/>
-            </ProtectedRoute>
-          }
+  return (
+    <BrowserRouter>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900 transition-all duration-500">
+        <Toaster 
+          position="top-right" 
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: 'var(--color-card)',
+              color: 'var(--color-foreground)',
+              border: '1px solid var(--color-border)',
+            },
+          }}
         />
-      
-    
-          {/* Redirect any unknown routes to dashboard for authenticated users */}
-          <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />} />
+        
+        {/* Show Navbar only when authenticated */}
+        {isAuthenticated && <Navbar />}
+        
+        <Routes>
+          {/* Public routes - only accessible when NOT authenticated */}
+          <Route 
+            path="/login" 
+            element={
+              isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />
+            } 
+          />
+          <Route 
+            path="/register" 
+            element={
+              isAuthenticated ? <Navigate to="/dashboard" replace /> : <Register />
+            } 
+          />
+          
+          {/* Root route - redirect based on auth status */}
+          <Route
+            path="/"
+            element={
+              isAuthenticated 
+                ? <Navigate to="/dashboard" replace /> 
+                : <Navigate to="/login" replace />
+            }
+          />
 
-   </Routes>
-    </div>
-  </BrowserRouter>
-);
+          {/* Protected routes - only accessible when authenticated */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          
+          <Route
+            path="/admin-dashboard"
+            element={
+              <RoleProtectedRoute allowedRoles={['admin']}>
+                <AdminDashboard />
+              </RoleProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/tenant-dashboard"
+            element={
+              <RoleProtectedRoute allowedRoles={['tenant']}>
+                <TenantDashboard />
+              </RoleProtectedRoute>
+            }
+          />
+    
+          {/* Catch all route */}
+          <Route 
+            path="*" 
+            element={
+              <Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />
+            } 
+          />
+        </Routes>
+      </div>
+    </BrowserRouter>
+  );
 }

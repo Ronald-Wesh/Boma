@@ -1,6 +1,5 @@
-// export default Register;
 import { useState } from 'react';
-import { useAuth } from '../context/AuthContext.jsx';
+import useAuth from '../hooks/useAuth'
 import { useNavigate, Navigate, Link } from 'react-router-dom';
 import { Button } from '../components/ui/button.jsx';
 import { Eye, EyeOff, Mail, Lock, User, Home, Shield, UserCheck, Users } from 'lucide-react';
@@ -15,12 +14,16 @@ const Register = () => {
   });
   const [submitting, setSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
+  // Redirect if already authenticated
   if (isAuthenticated) return <Navigate to="/dashboard" replace />;
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+    // Clear error when user starts typing
+    if (error) setError('');
   };
 
   const handleSubmit = async (e) => {
@@ -28,11 +31,20 @@ const Register = () => {
     if (!form.username || !form.email || !form.password) return;
     
     setSubmitting(true);
-    const res = await register(form);
-    setSubmitting(false);
+    setError('');
     
-    if (res.success) {
-      navigate('/dashboard');
+    try {
+      const res = await register(form);
+      if (res.success) {
+        // Navigation will be handled by the auth state change in App.js
+        // But we can also explicitly navigate as a backup
+        navigate('/dashboard');
+      }
+    } catch (err) {
+      setError(err.message || 'Registration failed. Please try again.');
+      console.error('Registration error:', err);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -40,21 +52,21 @@ const Register = () => {
     {
       value: 'tenant',
       label: 'Tenant',
-      description: 'Looking for a place to rent',
+      description: 'Looking For A Place To Rent',
       icon: User,
       color: 'from-blue-500 to-cyan-500'
     },
     {
       value: 'landlord',
       label: 'Landlord',
-      description: 'I have properties to rent',
+      description: 'I Have Properties To Rent',
       icon: UserCheck,
       color: 'from-green-500 to-emerald-500'
     },
     {
       value: 'admin',
       label: 'Admin',
-      description: 'Platform administrator',
+      description: 'Platform Administrator',
       icon: Shield,
       color: 'from-red-500 to-pink-500'
     }
@@ -80,6 +92,13 @@ const Register = () => {
         {/* Register Form */}
         <div className="backdrop-blur-xl bg-white/10 dark:bg-white/5 border border-white/20 rounded-2xl p-8 shadow-2xl">
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Error Message */}
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
+                <p className="text-red-400 text-sm text-center">{error}</p>
+              </div>
+            )}
+
             {/* Username Field */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-200">Username</label>
@@ -91,7 +110,7 @@ const Register = () => {
                   value={form.username}
                   onChange={handleChange}
                   className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                  placeholder="Choose a username"
+                  placeholder="Choose a Username"
                   required
                 />
               </div>
@@ -108,7 +127,7 @@ const Register = () => {
                   value={form.email}
                   onChange={handleChange}
                   className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                  placeholder="Enter your email"
+                  placeholder="Enter your Email"
                   required
                 />
               </div>
@@ -125,7 +144,7 @@ const Register = () => {
                   value={form.password}
                   onChange={handleChange}
                   className="w-full pl-10 pr-12 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                  placeholder="Create a password"
+                  placeholder="Create a Password"
                   required
                   minLength={6}
                 />
@@ -134,7 +153,7 @@ const Register = () => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400 hover:text-slate-300 transition-colors"
                 >
-                  {showPassword ? <EyeOff /> : <Eye />}
+                  {showPassword ? <Eye /> : <EyeOff />}
                 </button>
               </div>
               <p className="text-xs text-slate-400">Must be at least 6 characters</p>
@@ -142,7 +161,7 @@ const Register = () => {
 
             {/* Role Selection */}
             <div className="space-y-3">
-              <label className="text-sm font-medium text-slate-200">I am a...</label>
+              <label className="text-m font-medium text-slate-200">I Am a...</label>
               <div className="space-y-2">
                 {roleOptions.map((option) => {
                   const Icon = option.icon;
